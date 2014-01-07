@@ -8,7 +8,7 @@
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black" />
 		
-		
+		<script src="libs/jquery-1.8.3.min.js"></script>
 		
 	
 	</head>
@@ -17,15 +17,56 @@
 
 		
 		<script src="cordova.js"></script>
-		<audio src='http://www.mdinteractivo.com/12 - Allah.mp3' autoplay controls >
+		
 		<script>
 				
 			document.addEventListener('deviceready', deviceready, false);
+			var SERVER = 'http://192.168.235.153/player_local_mobile/' 
+			var audio = new Audio();
+			audio.addEventListener('ended', doEnd)
+			var en_mp3 = 0;
+			var xml;
+
 			function deviceready(){
 
-				window.plugins.insomnia.keepAwake()
+				window.plugins.insomnia.keepAwake();
+
+
+			}				
+			
+			function doEnd(){
+				en_mp3++;
+				
+				if(en_mp3>=$(xml).find('t').length) en_mp3 = 0
+
+				siguiente()
 
 			}
+
+			function siguiente(){
+				
+				$.ajax({
+					
+					type: "GET",
+					url: SERVER + "data.php",
+					dataType: 'xml',
+					cache:false, 
+					
+					success: function($xml) {
+						xml = $xml
+						audio.src = SERVER + $($xml).find('t').eq(en_mp3).attr('src')
+						audio.play()
+
+					},
+					
+					error: function() {
+					
+					}
+
+				});
+
+			}
+			siguiente()
 
 		</script>
 		
